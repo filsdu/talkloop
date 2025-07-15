@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TalkLoop – A Voice When You Need One</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <!-- Font Awesome CDN for reliable icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    html[data-theme='dark'] {
+      --bg: #111827;
+      --text: #f9fafb;
+      --card: #1f2937;
+    }
+    html[data-theme='light'] {
+      --bg: #f9fafb;
+      --text: #111827;
+      --card: #ffffff;
+    }
+    
+    /* Animation and Transition Styles */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    .animate-fadeIn {
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+    
+    .animate-pulse {
+      animation: pulse 2s infinite;
+    }
+    
+    .hover-grow {
+      transition: transform 0.3s ease;
+    }
+    
+    .hover-grow:hover {
+      transform: scale(1.03);
+    }
+    
+    .btn-transition {
+      transition: all 0.3s ease;
+    }
+    
+    .btn-transition:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    
+    /* Hide all sections by default */
+    .page-section {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    
+    /* Show active section */
+    .page-section.active {
+      display: block;
+      opacity: 1;
+    }
+    
+    /* Active nav link styling */
+    .nav-link.active {
+      font-weight: bold;
+      text-decoration: underline;
+      color: white;
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #6366f1;
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #4f46e5;
+    }
+
+    /* Mobile menu styles */
+    .mobile-menu {
+      transform: translateX(100%);
+      transition: transform 0.3s ease-out;
+    }
+    
+    .mobile-menu.open {
+      transform: translateX(0);
+    }
+    
+    .backdrop {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    
+    .backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+  </style>
+</head>
+<body class="bg-[var(--bg)] text-[var(--text)] font-sans scroll-smooth">
+  <!-- Mobile Menu Backdrop -->
+  <div class="backdrop fixed inset-0 bg-black bg-opacity-50 z-40" onclick="toggleMobileMenu()"></div>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu fixed top-0 right-0 h-full w-64 bg-gradient-to-b from-blue-700 to-purple-800 text-white p-6 z-50 overflow-y-auto">
+    <div class="flex justify-between items-center mb-8">
+      <h2 class="text-xl font-bold">Menu</h2>
+      <button onclick="toggleMobileMenu()" class="text-2xl">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <nav class="flex flex-col space-y-4">
+      <a href="#home" class="nav-link hover:underline py-2 px-4 rounded active" data-section="home" onclick="closeMobileMenu()">Home</a>
+      <a href="#how-it-works" class="nav-link hover:underline py-2 px-4 rounded" data-section="how-it-works" onclick="closeMobileMenu()">How It Works</a>
+      <a href="#join" class="nav-link hover:underline py-2 px-4 rounded" data-section="join" onclick="closeMobileMenu()">Join</a>
+      <a href="#schedule" class="nav-link hover:underline py-2 px-4 rounded" data-section="schedule" onclick="closeMobileMenu()">Schedule</a>
+      <a href="#ai-buddy" class="nav-link hover:underline py-2 px-4 rounded" data-section="ai-buddy" onclick="closeMobileMenu()">AI Buddy</a>
+      <a href="#donate" class="nav-link hover:underline py-2 px-4 rounded" data-section="donate" onclick="closeMobileMenu()">Donate</a>
+      <a href="#story" class="nav-link hover:underline py-2 px-4 rounded" data-section="story" onclick="closeMobileMenu()">Story</a>
+      <a href="#contact" class="nav-link hover:underline py-2 px-4 rounded" data-section="contact" onclick="closeMobileMenu()">Contact</a>
+      <button onclick="toggleTheme()" title="Toggle Theme" class="text-left py-2 px-4 rounded hover:bg-blue-600 text-white">
+        <i class="fas fa-adjust mr-2"></i>Toggle Theme
+      </button>
+    </nav>
+  </div>
+
+  <header class="w-full bg-gradient-to-r from-blue-600 to-purple-700 text-white py-6 px-4 shadow sticky top-0 z-30 animate-fadeIn">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-3 hover-grow">
+        <img src="logo.png" alt="TalkLoop Logo" class="w-12 h-12 rounded-full object-contain">
+        <h1 class="text-2xl font-bold tracking-tight">TalkLoop</h1>
+      </div>
+      <nav class="hidden md:flex items-center space-x-6 text-sm">
+        <a href="#home" class="nav-link hover:underline active" data-section="home">Home</a>
+        <a href="#how-it-works" class="nav-link hover:underline" data-section="how-it-works">How It Works</a>
+        <a href="#join" class="nav-link hover:underline" data-section="join">Join</a>
+        <a href="#schedule" class="nav-link hover:underline" data-section="schedule">Schedule</a>
+        <a href="#ai-buddy" class="nav-link hover:underline" data-section="ai-buddy">AI Buddy</a>
+        <a href="#donate" class="nav-link hover:underline" data-section="donate">Donate</a>
+        <a href="#story" class="nav-link hover:underline" data-section="story">Story</a>
+        <a href="#contact" class="nav-link hover:underline" data-section="contact">Contact</a>
+        <button onclick="toggleTheme()" title="Toggle Theme" class="text-lg ml-2 hover-grow"><i class="fas fa-adjust"></i></button>
+      </nav>
+      <button class="md:hidden text-2xl hover-grow" onclick="toggleMobileMenu()">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Home Section -->
+  <section id="home" class="page-section active">
+    <main class="bg-[var(--bg)] text-[var(--text)]">
+      <section class="text-center px-4 py-20 md:py-32 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-800 dark:to-gray-700">
+        <h2 class="text-4xl md:text-5xl font-bold leading-tight mb-6 animate-fadeIn" style="animation-delay: 0.2s;">A Voice When You Need One</h2>
+        <p class="text-lg md:text-xl max-w-2xl mx-auto mb-8 animate-fadeIn" style="animation-delay: 0.4s;">TalkLoop is an anonymous call line where anyone can connect, talk, and feel heard. Free, open, and human — or try our AI Buddy any time.</p>
+        <div class="flex justify-center gap-4 flex-wrap animate-fadeIn" style="animation-delay: 0.6s;">
+          <a href="tel:+12497005489" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold text-lg btn-transition">
+            <i class="fas fa-phone-alt mr-2"></i>Call Now
+          </a>
+          <a href="#ai-buddy" class="bg-gray-800 hover:bg-gray-900 text-white px-6 py-3 rounded-lg font-semibold text-lg btn-transition">
+            <i class="fas fa-robot mr-2"></i>Try AI Buddy
+          </a>
+        </div>
+      </section>
+
+      <section class="max-w-6xl mx-auto px-6 py-16 grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="bg-[var(--card)] p-6 rounded-2xl shadow-md hover:shadow-lg transition hover-grow animate-fadeIn" style="animation-delay: 0.2s;">
+          <div class="text-blue-600 text-3xl mb-4"><i class="fas fa-phone"></i></div>
+          <h3 class="text-xl font-bold mb-2">How It Works</h3>
+          <p class="text-sm mb-4">Learn how calls are routed to Loopers or our AI. Simple, fast, anonymous.</p>
+          <a href="#how-it-works" class="text-blue-600 font-semibold hover:underline">Explore</a>
+        </div>
+        <div class="bg-[var(--card)] p-6 rounded-2xl shadow-md hover:shadow-lg transition hover-grow animate-fadeIn" style="animation-delay: 0.4s;">
+          <div class="text-purple-600 text-3xl mb-4"><i class="fas fa-users"></i></div>
+          <h3 class="text-xl font-bold mb-2">Join the Loop</h3>
+          <p class="text-sm mb-4">Become a Looper and help others. Sign up, set your availability, and listen.</p>
+          <a href="#join" class="text-purple-600 font-semibold hover:underline">Sign Up</a>
+        </div>
+        <div class="bg-[var(--card)] p-6 rounded-2xl shadow-md hover:shadow-lg transition hover-grow animate-fadeIn" style="animation-delay: 0.6s;">
+          <div class="text-green-600 text-3xl mb-4"><i class="fas fa-robot"></i></div>
+          <h3 class="text-xl font-bold mb-2">AI Buddy</h3>
+          <p class="text-sm mb-4">Our AI is here when Loopers aren't. Open, intelligent, safe support.</p>
+          <a href="#ai-buddy" class="text-green-600 font-semibold hover:underline">Try It</a>
+        </div>
+        <div class="bg-[var(--card)] p-6 rounded-2xl shadow-md hover:shadow-lg transition hover-grow animate-fadeIn" style="animation-delay: 0.8s;">
+          <div class="text-red-500 text-3xl mb-4"><i class="fas fa-heart"></i></div>
+          <h3 class="text-xl font-bold mb-2">Support Us</h3>
+          <p class="text-sm mb-4">Keep TalkLoop alive. Help fund our work and grow the network.</p>
+          <a href="#donate" class="text-red-500 font-semibold hover:underline">Donate</a>
+        </div>
+      </section>
+    </main>
+  </section>
+
+  <!-- How It Works Section -->
+  <section id="how-it-works" class="page-section">
+    <main class="px-6 py-16 max-w-5xl mx-auto">
+      <h2 class="text-3xl font-bold text-center mb-10 animate-fadeIn">How TalkLoop Works</h2>
+
+      <div class="grid md:grid-cols-2 gap-10">
+        <div class="bg-[var(--card)] p-6 rounded-xl shadow-md hover-grow animate-fadeIn" style="animation-delay: 0.2s;">
+          <h3 class="text-xl font-bold mb-2">📞 Anonymous One-on-One Calls</h3>
+          <p class="text-sm">Callers dial <strong>+1 (249) 700-5489</strong> and choose their path using the keypad:
+            <ul class="list-disc ml-6 mt-2 text-sm">
+              <li>Press 1 – Talk to a Student</li>
+              <li>Press 2 – Talk to an Elder</li>
+              <li>Press 3 – Random Chat</li>
+              <li>Press 4 – Crisis Support</li>
+              <li>Press 0 – Talk to the AI Buddy</li>
+            </ul>
+          </p>
+        </div>
+
+        <div class="bg-[var(--card)] p-6 rounded-xl shadow-md hover-grow animate-fadeIn" style="animation-delay: 0.4s;">
+          <h3 class="text-xl font-bold mb-2">🎧 Loopers: Human Listeners</h3>
+          <p class="text-sm">Loopers are real people who sign up to take anonymous calls. They can set their availability by texting <strong>ONLINE</strong> or <strong>OFFLINE</strong> to the TalkLoop system. Calls are routed to online Loopers through Twilio's TaskRouter.</p>
+        </div>
+
+        <div class="bg-[var(--card)] p-6 rounded-xl shadow-md hover-grow animate-fadeIn" style="animation-delay: 0.6s;">
+          <h3 class="text-xl font-bold mb-2">🤖 AI Buddy (Always Available)</h3>
+          <p class="text-sm">If no Loopers are online, callers can talk to our AI Buddy — a supportive, empathetic assistant powered by OpenAI. It listens, responds naturally, and maintains a safe, anonymous space.</p>
+        </div>
+
+        <div class="bg-[var(--card)] p-6 rounded-xl shadow-md hover-grow animate-fadeIn" style="animation-delay: 0.8s;">
+          <h3 class="text-xl font-bold mb-2">👥 Group Chats</h3>
+          <p class="text-sm">Every Tuesday & Friday at 7PM, we host a group voice chat. Loopers can RSVP via SMS and are auto-called 5 minutes before the session. It uses Twilio Conference to connect all participants.</p>
+        </div>
+
+        <div class="bg-[var(--card)] p-6 rounded-xl shadow-md hover-grow animate-fadeIn" style="animation-delay: 1.0s;">
+          <h3 class="text-xl font-bold mb-2">📲 Reminder & RSVP System</h3>
+          <p class="text-sm">Loopers text <strong>JOIN</strong> to RSVP for a group chat or <strong>BUSY</strong> to opt out. The system stores these temporarily, sends reminders, and auto-dials only the JOINed Loopers.</p>
+        </div>
+
+        <div class="bg-[var(--card)] p-6 rounded-xl shadow-md hover-grow animate-fadeIn" style="animation-delay: 1.2s;">
+          <h3 class="text-xl font-bold mb-2">⭐ Feedback & Trust System</h3>
+          <p class="text-sm">After each one-on-one call, users can press a key to rate the experience. Loopers are notified if they receive a low rating. Admins track performance via Google Sheets.</p>
+        </div>
+      </div>
+    </main>
+  </section>
+
+  <!-- Join Section -->
+  <section id="join" class="page-section">
+    <main class="px-6 py-16 max-w-3xl mx-auto">
+      <h2 class="text-3xl font-bold text-center mb-10 animate-fadeIn">Join the Loop</h2>
+
+      <section class="bg-[var(--card)] p-6 rounded-xl shadow mb-12 hover-grow animate-fadeIn" style="animation-delay: 0.2s;">
+        <h3 class="text-xl font-semibold mb-4">Become a Looper</h3>
+        <form id="looperForm" class="space-y-4" action="https://talkloop-1358.twil.io/path_1" method="POST">
+          <div>
+            <label for="name" class="block font-semibold mb-1">Full Name</label>
+            <input id="name" name="name" type="text" required class="w-full px-4 py-2 rounded border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" />
+          </div>
+          <div>
+            <label for="phone" class="block font-semibold mb-1">Phone Number (+1...)</label>
+            <input id="phone" name="phone" type="tel" required class="w-full px-4 py-2 rounded border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" />
+          </div>
+          <div>
+            <label for="group" class="block font-semibold mb-1">Group</label>
+            <select id="group" name="group" class="w-full px-4 py-2 rounded border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+              <option value="students">Students</option>
+              <option value="elders">Elders</option>
+              <option value="general">General</option>
+            </select>
+          </div>
+          <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg btn-transition">
+            Sign Up
+          </button>
+          <p id="response" class="text-center text-green-500 font-semibold mt-2 animate-fadeIn"></p>
+        </form>
+      </section>
+
+      <section class="bg-[var(--card)] p-6 rounded-xl shadow mb-12 hover-grow animate-fadeIn" style="animation-delay: 0.4s;">
+        <h3 class="text-xl font-semibold mb-3">Group Chat RSVP</h3>
+        <p class="text-sm mb-2">To join the next chat session, text <strong>JOIN</strong> to our line.</p>
+        <p class="text-sm">To skip this session, text <strong>BUSY</strong>.</p>
+      </section>
+
+      <section class="bg-[var(--card)] p-6 rounded-xl shadow hover-grow animate-fadeIn" style="animation-delay: 0.6s;">
+        <h3 class="text-xl font-semibold mb-3">Availability Status</h3>
+        <p class="text-sm mb-2">Text <span class="font-bold">ONLINE</span> when you're ready to take calls.</p>
+        <p class="text-sm">Text <span class="font-bold">OFFLINE</span> when you're unavailable.</p>
+      </section>
+    </main>
+  </section>
+
+  <!-- Schedule Section -->
+  <section id="schedule" class="page-section">
+    <main class="px-6 py-16 max-w-3xl mx-auto">
+      <h2 class="text-3xl font-bold text-center mb-8 animate-fadeIn">Group Chat Schedule</h2>
+
+      <section class="bg-[var(--card)] p-6 rounded-xl shadow mb-10 hover-grow animate-fadeIn" style="animation-delay: 0.2s;">
+        <h3 class="text-xl font-semibold mb-2">🗓️ Weekly Chats</h3>
+        <p class="text-sm">Join our live, anonymous group voice chats held:</p>
+        <ul class="list-disc ml-6 mt-2 text-sm">
+          <li><strong>Tuesdays</strong> at 7:00 PM</li>
+          <li><strong>Fridays</strong> at 7:00 PM</li>
+        </ul>
+      </section>
+
+      <section class="bg-[var(--card)] p-6 rounded-xl shadow mb-10 hover-grow animate-fadeIn" style="animation-delay: 0.4s;">
+        <h3 class="text-xl font-semibold mb-2">📲 RSVP Instructions</h3>
+        <p class="text-sm mb-2">Text <span class="font-bold">JOIN</span> to our number to RSVP for the next group chat.</p>
+        <p class="text-sm mb-2">Text <span class="font-bold">BUSY</span> if you're unavailable for that session.</p>
+        <p class="text-sm">You'll get a reminder 5 minutes before the call and be auto-dialed in when it starts.</p>
+      </section>
+
+      <section class="bg-[var(--card)] p-6 rounded-xl shadow hover-grow animate-fadeIn" style="animation-delay: 0.6s;">
+        <h3 class="text-xl font-semibold mb-2">🔔 Reminder & Auto-Call Logic</h3>
+        <ul class="list-disc ml-6 text-sm">
+          <li>Only those who RSVP with <strong>JOIN</strong> are added to the dial list.</li>
+          <li>You'll receive a reminder SMS 5 minutes before the group starts.</li>
+          <li>Our system will automatically dial you into the group using Twilio Conference.</li>
+        </ul>
+      </section>
+    </main>
+  </section>
+
+  <!-- AI Buddy Section -->
+  <section id="ai-buddy" class="page-section">
+    <main class="px-6 py-16 max-w-3xl mx-auto">
+      <h2 class="text-3xl font-bold text-center mb-10 animate-fadeIn">Meet the AI Buddy</h2>
+
+      <section class="bg-[var(--card)] p-6 rounded-xl shadow mb-10 hover-grow animate-fadeIn" style="animation-delay: 0.2s;">
+        <h3 class="text-xl font-semibold mb-2">🤖 Always Available</h3>
+        <p class="text-sm">The TalkLoop AI Buddy is your digital companion — available 24/7 when no human Loopers are online. It offers a warm, empathetic voice experience powered by advanced AI (OpenAI + Twilio).</p>
+      </section>
+
+      <section class="bg-[var(--card)] p-6 rounded-xl shadow mb-10 hover-grow animate-fadeIn" style="animation-delay: 0.4s;">
+        <h3 class="text-xl font-semibold mb-2">🎙️ How It Works</h3>
+        <ul class="list-disc ml-6 text-sm">
+          <li>Call <strong>+1 (249) 700-5489</strong></li>
+          <li>Press <strong>0</strong> to talk to the AI Buddy</li>
+          <li>The system uses voice recognition + real-time AI response</li>
+          <li>Conversations are private and not stored</li>
+        </ul>
+      </section>
+
+      <section class="bg-[var(--card)] p-6 rounded-xl shadow mb-10 hover-grow animate-fadeIn" style="animation-delay: 0.6s;">
+        <h3 class="text-xl font-semibold mb-2">🧠 Sample Conversations</h3>
+        <div class="text-sm space-y-4">
+          <p><strong>You:</strong> I'm feeling overwhelmed lately...</p>
+          <p><strong>AI Buddy:</strong> I'm really sorry to hear that. Want to talk about what's been on your mind?</p>
+          <p><strong>You:</strong> Yeah, just a lot going on with work and life.</p>
+          <p><strong>AI Buddy:</strong> That sounds tough. It's okay to feel this way — you're not alone.</p>
+        </div>
+      </section>
+
+      <div class="text-center animate-fadeIn" style="animation-delay: 0.8s;">
+        <a href="tel:+12497005489" class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded-lg text-lg btn-transition"><i class="fas fa-phone-alt mr-2"></i>Try AI Buddy</a>
+      </div>
+    </main>
+  </section>
+
+  <!-- Donate Section -->
+  <section id="donate" class="page-section">
+    <main class="px-6 py-16 max-w-3xl mx-auto">
+      <h2 class="text-3xl font-bold text-center mb-10 animate-fadeIn">Support TalkLoop</h2>
+
+      <section class="bg-[var(--card)] p-6 rounded-xl shadow mb-10 text-center hover-grow animate-fadeIn" style="animation-delay: 0.2s;">
+        <h3 class="text-xl font-semibold mb-3">🌍 Why Donate?</h3>
+        <p class="text-sm">TalkLoop is entirely free for users. Your donation helps us cover call costs, server uptime, and Looper tools — keeping the service alive, anonymous, and accessible to all.</p>
+      </section>
+
+      <section class="bg-[var(--card)] p-6 rounded-xl shadow mb-10 text-center hover-grow animate-fadeIn" style="animation-delay: 0.4s;">
+        <h3 class="text-xl font-semibold mb-3">💸 Make a Contribution</h3>
+        <a href="https://www.paypal.me/talkloop" target="_blank" class="inline-block bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-lg text-lg btn-transition animate-pulse">
+          <i class="fas fa-heart mr-2"></i>Donate via PayPal
+        </a>
+        <p class="text-sm text-gray-500 mt-3">Every little bit counts. Thank you for helping people feel heard.</p>
+      </section>
+
+      <section class="bg-[var(--card)] p-6 rounded-xl shadow text-sm hover-grow animate-fadeIn" style="animation-delay: 0.6s;">
+        <h3 class="text-xl font-semibold mb-3">📈 What Your Gift Supports</h3>
+        <ul class="list-disc ml-6">
+          <li>Twilio call credits for one-on-one and group sessions</li>
+          <li>Infrastructure for the AI Buddy and scheduling</li>
+          <li>Admin tools for safety and analytics</li>
+          <li>Community outreach and Looper onboarding</li>
+        </ul>
+      </section>
+    </main>
+  </section>
+
+  <!-- Story Section -->
+  <section id="story" class="page-section">
+    <main class="px-6 py-16 max-w-3xl mx-auto">
+      <h2 class="text-3xl font-bold text-center mb-10 animate-fadeIn">The Story Behind TalkLoop</h2>
+
+      <article class="bg-[var(--card)] p-6 rounded-xl shadow space-y-6 text-sm hover-grow animate-fadeIn" style="animation-delay: 0.2s;">
+        <p>TalkLoop was born from a quiet porch and a conversation that never lasted long enough. There was an elderly woman in my neighborhood — kind, warm, and quietly yearning for connection. She lived with her husband, but he was often away at work. Every day, she would sit out on her porch, not to enjoy the weather, but to wait — to hope someone would stop by and speak with her. Just a few words. A little warmth. A voice that reminded her she wasn't alone.</p>
+
+        <p>She would greet every passerby with a gentle smile and a cheerful "hello." Many would wave or smile politely — then hurry back to their busy lives. No one stopped. No one stayed. And so she sat, waiting, day after day.</p>
+
+        <p>Whenever I had time, I'd sit beside her and listen. Her eyes would light up, her stories would flow, and for a few moments, she came alive. But I wasn't always there. Life gets busy. People are tired. And she, like so many others, went unnoticed.</p>
+
+        <p>That's when the idea hit me:</p>
+
+        <p>What if she could simply call a number — any time, any day — and be connected to someone willing to talk?</p>
+
+        <p>What if anyone feeling isolated could be linked to a stranger's kindness, a student's curiosity, or a fellow elder's wisdom?</p>
+
+        <p>That's how TalkLoop began. Not as an app. Not as a business. But as a promise: No one should feel alone.</p>
+      </article>
+    </main>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="page-section">
+    <main class="px-6 py-16 max-w-3xl mx-auto">
+      <h2 class="text-3xl font-bold text-center mb-10 animate-fadeIn">Get in Touch</h2>
+
+      <section class="bg-[var(--card)] p-6 rounded-xl shadow space-y-6 animate-fadeIn" style="animation-delay: 0.2s;">
+        <p class="text-sm text-center">Have a question, partnership idea, or want to get involved? We'd love to hear from you.</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- WhatsApp Button -->
+          <a href="https://wa.me/12267537533" target="_blank" class="bg-green-500 hover:bg-green-600 text-white p-4 rounded-lg flex items-center justify-center space-x-2 btn-transition">
+            <i class="fab fa-whatsapp text-2xl"></i>
+            <span>WhatsApp</span>
+          </a>
+          
+          <!-- Facebook Button -->
+          <a href="https://www.facebook.com/share/16X3b1kqoK/" target="_blank" class="bg-blue-700 hover:bg-blue-800 text-white p-4 rounded-lg flex items-center justify-center space-x-2 btn-transition">
+            <i class="fab fa-facebook-f text-2xl"></i>
+            <span>Facebook</span>
+          </a>
+          
+          <!-- Instagram Button -->
+          <a href="https://www.instagram.com/talkloop_org?igsh=MXA1YWJvd2VoajB2Yw==" target="_blank" class="bg-pink-600 hover:bg-pink-700 text-white p-4 rounded-lg flex items-center justify-center space-x-2 btn-transition">
+            <i class="fab fa-instagram text-2xl"></i>
+            <span>Instagram</span>
+          </a>
+          
+          <!-- Email Button -->
+          <a href="mailto:talkloopers@gmail.com" class="bg-gray-600 hover:bg-gray-700 text-white p-4 rounded-lg flex items-center justify-center space-x-2 btn-transition">
+            <i class="fas fa-envelope text-2xl"></i>
+            <span>Email Us</span>
+          </a>
+          
+          <!-- Phone Button -->
+          <a href="tel:+12497005489" class="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg flex items-center justify-center space-x-2 btn-transition">
+            <i class="fas fa-phone-alt text-2xl"></i>
+            <span>Call Now</span>
+          </a>
+          
+          <!-- PayPal Donation Button -->
+          <a href="https://www.paypal.me/talkloop" target="_blank" class="bg-yellow-500 hover:bg-yellow-600 text-white p-4 rounded-lg flex items-center justify-center space-x-2 btn-transition">
+            <i class="fab fa-paypal text-2xl"></i>
+            <span>Donate</span>
+          </a>
+        </div>
+
+        <div class="text-center mt-6">
+          <p class="text-sm">Prefer email? Contact us directly at:</p>
+          <a href="mailto:talkloopers@gmail.com" class="text-blue-600 font-semibold hover:underline">talkloopers@gmail.com</a>
+        </div>
+      </section>
+    </main>
+  </section>
+
+  <footer class="bg-white dark:bg-gray-800 text-center text-sm text-gray-600 dark:text-gray-300 py-6 px-4">
+    <div class="flex justify-center gap-6 text-xl mb-2">
+      <a href="tel:+12497005489" class="text-blue-600 hover:text-blue-800 hover-grow" title="Call Now"><i class="fas fa-phone"></i></a>
+      <a href="https://wa.me/12267537533" target="_blank" class="text-green-500 hover:text-green-700 hover-grow" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+      <a href="https://www.facebook.com/share/16X3b1kqoK/" target="_blank" class="text-blue-700 hover:text-blue-900 hover-grow" title="Facebook"><i class="fab fa-facebook"></i></a>
+      <a href="https://www.instagram.com/talkloop_org?igsh=MXA1YWJvd2VoajB2Yw==" target="_blank" class="text-pink-500 hover:text-pink-700 hover-grow" title="Instagram"><i class="fab fa-instagram"></i></a>
+    </div>
+    <p>&copy; 2025 TalkLoop. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Theme toggle function
+    function toggleTheme() {
+      const html = document.documentElement;
+      const newTheme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+      html.dataset.theme = newTheme;
+      
+      // Save preference to localStorage
+      localStorage.setItem('theme', newTheme);
+      
+      // Update button icon
+      const themeIcon = document.querySelector('[title="Toggle Theme"] i');
+      if (themeIcon) {
+        themeIcon.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-adjust';
+      }
+    }
+
+    // Mobile menu functions
+    function toggleMobileMenu() {
+      const menu = document.querySelector('.mobile-menu');
+      const backdrop = document.querySelector('.backdrop');
+      menu.classList.toggle('open');
+      backdrop.classList.toggle('active');
+    }
+
+    function closeMobileMenu() {
+      const menu = document.querySelector('.mobile-menu');
+      const backdrop = document.querySelector('.backdrop');
+      menu.classList.remove('open');
+      backdrop.classList.remove('active');
+    }
+
+    // Navigation handling
+    document.addEventListener('DOMContentLoaded', function() {
+      // Set initial theme from localStorage
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      document.documentElement.dataset.theme = savedTheme;
+      
+      // Update theme icon
+      const themeIcon = document.querySelector('[title="Toggle Theme"] i');
+      if (themeIcon) {
+        themeIcon.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-adjust';
+      }
+
+      // Handle navigation clicks (both desktop and mobile)
+      const navLinks = document.querySelectorAll('.nav-link');
+      navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const sectionId = this.getAttribute('data-section');
+          showSection(sectionId);
+          
+          // Update active nav link
+          navLinks.forEach(link => link.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Update URL without reloading
+          history.pushState(null, null, `#${sectionId}`);
+        });
+      });
+
+      // Handle form submission
+      document.getElementById('looperForm')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const responseEl = document.getElementById('response');
+        
+        // Get form data
+        const formData = {
+          name: form.name.value,
+          phone: form.phone.value,
+          group: form.group.value
+        };
+
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+        responseEl.textContent = '';
+        responseEl.classList.remove('text-green-500', 'text-red-500');
+
+        try {
+          const response = await fetch(form.action, {  // Now using form.action which points to your Twilio endpoint
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify(formData)
+          });
+
+          const result = await response.json();
+          
+          if (response.ok) {
+            responseEl.textContent = result.message || 'Thank you for signing up! We will contact you soon.';
+            responseEl.classList.add('text-green-500');
+            form.reset(); // Reset form on success
+          } else {
+            throw new Error(result.message || 'Failed to submit form');
+          }
+        } catch (err) {
+          console.error('Form submission error:', err);
+          responseEl.textContent = typeof err === 'string' ? err : 
+            err.message || 'Something went wrong. Please try again later.';
+          responseEl.classList.add('text-red-500');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Sign Up';
+        }
+      });
+
+      // Check URL hash on load
+      const hash = window.location.hash.substring(1);
+      if (hash) {
+        showSection(hash);
+        // Update active nav link
+        navLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('data-section') === hash) {
+            link.classList.add('active');
+          }
+        });
+      }
+    });
+
+    // Show the selected section
+    function showSection(sectionId) {
+      const sections = document.querySelectorAll('.page-section');
+      sections.forEach(section => {
+        section.classList.remove('active');
+        if (section.id === sectionId) {
+          section.classList.add('active');
+        }
+      });
+      
+      // Scroll to top of the section
+      document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Handle back/forward navigation
+    window.addEventListener('popstate', function() {
+      const hash = window.location.hash.substring(1);
+      if (hash) {
+        showSection(hash);
+        // Update active nav link
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('data-section') === hash) {
+            link.classList.add('active');
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
