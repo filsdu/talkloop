@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
@@ -9,6 +10,7 @@
   <meta name="keywords" content="anonymous call, talk anonymously, support line, talkloop, emotional help, AI buddy, student helpline, mental health support, call someone, human connection, no app chat, free support line, talk to a stranger">
 
   <!-- ✅ FAVICON + LOGO -->
+  <!-- Use the real logo for favicon and social previews -->
   <link rel="icon" href="/logo.png" type="image/png" />
   <meta property="og:image" content="https://talkloop.org/logo.png">
   <meta name="twitter:image" content="https://talkloop.org/logo.png">
@@ -28,6 +30,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
+    /*
+     * Colour variables are defined on the html element based on the selected theme.
+     * These cascade through the rest of the site so new components, like the
+     * welcome popup, inherit colours automatically.
+     */
     html[data-theme='dark'] {
       --bg: #111827;
       --text: #f9fafb;
@@ -38,77 +45,77 @@
       --text: #111827;
       --card: #ffffff;
     }
-    
+
     /* Animation and Transition Styles */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    
+
     @keyframes pulse {
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.05); }
     }
-    
+
     .animate-fadeIn {
       animation: fadeIn 0.6s ease-out forwards;
     }
-    
+
     .animate-pulse {
       animation: pulse 2s infinite;
     }
-    
+
     .hover-grow {
       transition: transform 0.3s ease;
     }
-    
+
     .hover-grow:hover {
       transform: scale(1.03);
     }
-    
+
     .btn-transition {
       transition: all 0.3s ease;
     }
-    
+
     .btn-transition:hover {
       transform: translateY(-2px);
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     }
-    
+
     /* Hide all sections by default */
     .page-section {
       display: none;
       opacity: 0;
       transition: opacity 0.5s ease;
     }
-    
+
     /* Show active section */
     .page-section.active {
       display: block;
       opacity: 1;
     }
-    
+
     /* Active nav link styling */
     .nav-link.active {
       font-weight: bold;
       text-decoration: underline;
       color: white;
     }
-    
+
     /* Custom scrollbar */
     ::-webkit-scrollbar {
       width: 8px;
     }
-    
+
     ::-webkit-scrollbar-track {
       background: var(--bg);
     }
-    
+
     ::-webkit-scrollbar-thumb {
       background: #6366f1;
       border-radius: 4px;
     }
-    
+
     ::-webkit-scrollbar-thumb:hover {
       background: #4f46e5;
     }
@@ -118,24 +125,295 @@
       transform: translateX(100%);
       transition: transform 0.3s ease-out;
     }
-    
+
     .mobile-menu.open {
       transform: translateX(0);
     }
-    
+
     .backdrop {
       opacity: 0;
       visibility: hidden;
       transition: opacity 0.3s ease, visibility 0.3s ease;
     }
-    
+
     .backdrop.active {
       opacity: 1;
       visibility: visible;
     }
+
+    /*
+     * Welcome popup styles. The overlay and content use theme variables so
+     * they blend into both light and dark modes. The z-index is high to
+     * ensure it sits above all other UI elements.
+     */
+    .popup-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.4s ease;
+    }
+
+    .popup-container.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .popup-content {
+      background: var(--card);
+      border-radius: 20px;
+      width: 95%;
+      max-width: 500px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+      transform: translateY(20px);
+      transition: transform 0.4s ease;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .popup-container.active .popup-content {
+      transform: translateY(0);
+    }
+
+    .popup-header {
+      background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+      color: white;
+      padding: 25px;
+      text-align: center;
+      position: relative;
+    }
+
+    .popup-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .popup-logo img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: white;
+      padding: 5px;
+    }
+
+    .popup-logo h1 {
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .popup-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255,255,255,0.2);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .popup-close:hover {
+      background: rgba(255,255,255,0.3);
+      transform: rotate(90deg);
+    }
+
+    .popup-body {
+      padding: 30px;
+    }
+
+    .popup-section {
+      margin-bottom: 25px;
+      padding-bottom: 25px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .popup-section:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border: none;
+    }
+
+    .popup-section h3 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+      color: #4f46e5;
+    }
+
+    .popup-section h3 i {
+      background: #eef2ff;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .popup-section p {
+      line-height: 1.6;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .popup-section ul {
+      padding-left: 25px;
+      margin-top: 10px;
+    }
+
+    .popup-section li {
+      margin-bottom: 8px;
+      line-height: 1.5;
+      color: var(--text);
+    }
+
+    .popup-section li strong {
+      color: #4f46e5;
+    }
+
+    .popup-footer {
+      background: var(--bg);
+      padding: 20px 30px;
+      text-align: center;
+      border-top: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .popup-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+      color: white;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+    }
+
+    .popup-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+    }
+
+    .popup-btn i {
+      margin-right: 8px;
+    }
+
+    .highlight {
+      background: #f0f9ff;
+      border-left: 4px solid #0ea5e9;
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      margin: 15px 0;
+    }
+
+    @media (max-width: 600px) {
+      .popup-content {
+        width: 95%;
+      }
+
+      .popup-body {
+        padding: 20px;
+      }
+
+      .popup-header {
+        padding: 20px 15px;
+      }
+    }
   </style>
 </head>
 <body class="bg-[var(--bg)] text-[var(--text)] font-sans scroll-smooth">
+  <!--
+    Welcome popup. This overlay appears only for first-time visitors. It uses
+    localStorage to remember whether the user has seen it before. The logo
+    uses the real TalkLoop logo (logo.png) so the branding matches the rest
+    of the site.
+  -->
+  <div class="popup-container" id="welcomePopup">
+    <div class="popup-content">
+      <div class="popup-header">
+        <div class="popup-logo">
+          <img src="logo.png" alt="TalkLoop Logo">
+          <h1>TalkLoop</h1>
+        </div>
+        <h2>👋 Welcome to TalkLoop!</h2>
+        <div class="popup-close" id="closePopup">
+          <i class="fas fa-times"></i>
+        </div>
+      </div>
+      <div class="popup-body">
+        <div class="popup-section">
+          <h3><i class="fas fa-phone-alt"></i> Need to Talk?</h3>
+          <p>Just call or text our dedicated line:</p>
+          <div class="highlight">
+            <p style="font-size: 18px; font-weight: bold; margin: 0;">+1 (249) 700-5489</p>
+            <p style="margin: 5px 0 0; font-size: 14px;">No app, no account – just real people ready to listen</p>
+          </div>
+        </div>
+        <div class="popup-section">
+          <h3><i class="fas fa-hands-helping"></i> Become a Looper</h3>
+          <p>Want to help others? Join our community of listeners:</p>
+          <ul>
+            <li><strong>Register once</strong> at talkloop.org</li>
+            <li>Text <strong>ONLINE</strong> to receive calls</li>
+            <li>Text <strong>OFFLINE</strong> when you're busy (default after registering)</li>
+          </ul>
+        </div>
+        <div class="popup-section">
+          <h3><i class="fas fa-user-secret"></i> Privacy &amp; Safety</h3>
+          <p>We take your privacy seriously:</p>
+          <ul>
+            <li><strong>All calls are anonymous</strong> – no one sees your real number</li>
+            <li>We use nicknames only to protect identities</li>
+            <li>Safe, judgment‑free space for everyone</li>
+          </ul>
+        </div>
+        <div class="popup-section">
+          <h3><i class="fas fa-users"></i> Group Chats</h3>
+          <p>Join our community conversations:</p>
+          <ul>
+            <li>Every <strong>Tuesday &amp; Friday at 7 PM</strong></li>
+            <li>Text <strong>JOIN</strong> to RSVP</li>
+            <li>Text <strong>BUSY</strong> to skip a session</li>
+          </ul>
+        </div>
+        <div class="popup-section">
+          <h3><i class="fas fa-heart"></i> Free &amp; Open</h3>
+          <p>TalkLoop is 100% free for users:</p>
+          <ul>
+            <li>Funded by donations and kindness</li>
+            <li>No hidden fees or subscriptions</li>
+            <li>Accessible to everyone who needs support</li>
+          </ul>
+        </div>
+      </div>
+      <div class="popup-footer">
+        <p style="margin-bottom: 15px; font-weight: 500;">➡️ Ready to get started?</p>
+        <a href="#" class="popup-btn" id="getStartedBtn">
+          <i class="fas fa-play-circle"></i> Explore TalkLoop
+        </a>
+      </div>
+    </div>
+  </div>
+
   <!-- Mobile Menu Backdrop -->
   <div class="backdrop fixed inset-0 bg-black bg-opacity-50 z-40" onclick="toggleMobileMenu()"></div>
 
@@ -261,16 +539,16 @@
 
         <div class="bg-[var(--card)] p-6 rounded-xl shadow-md hover-grow animate-fadeIn" style="animation-delay: 0.8s;">
           <h3 class="text-xl font-bold mb-2">👥 Group Chats</h3>
-          <p class="text-sm">Every Tuesday & Friday at 7PM, we host a group voice chat. Loopers can RSVP via SMS and are auto-called 5 minutes before the session. It uses Twilio Conference to connect all participants.</p>
+          <p class="text-sm">Every Tuesday &amp; Friday at 7PM, we host a group voice chat. Loopers can RSVP via SMS and are auto-called 5 minutes before the session. It uses Twilio Conference to connect all participants.</p>
         </div>
 
         <div class="bg-[var(--card)] p-6 rounded-xl shadow-md hover-grow animate-fadeIn" style="animation-delay: 1.0s;">
-          <h3 class="text-xl font-bold mb-2">📲 Reminder & RSVP System</h3>
+          <h3 class="text-xl font-bold mb-2">📲 Reminder &amp; RSVP System</h3>
           <p class="text-sm">Loopers text <strong>JOIN</strong> to RSVP for a group chat or <strong>BUSY</strong> to opt out. The system stores these temporarily, sends reminders, and auto-dials only the JOINed Loopers.</p>
         </div>
 
         <div class="bg-[var(--card)] p-6 rounded-xl shadow-md hover-grow animate-fadeIn" style="animation-delay: 1.2s;">
-          <h3 class="text-xl font-bold mb-2">⭐ Feedback & Trust System</h3>
+          <h3 class="text-xl font-bold mb-2">⭐ Feedback &amp; Trust System</h3>
           <p class="text-sm">After each one-on-one call, users can press a key to rate the experience. Loopers are notified if they receive a low rating. Admins track performance via Google Sheets.</p>
         </div>
       </div>
@@ -318,7 +596,7 @@
         <h3 class="text-xl font-semibold mb-3">Availability Status</h3>
         <p class="text-sm mb-2">Text <span class="font-bold">ONLINE</span> when you're ready to take calls.</p>
         <p class="text-sm">Text <span class="font-bold">OFFLINE</span> when you're unavailable.</p>
-         <p class="text-sm">Text <span class="font-bold">COMMANDS</span> too see all commands</p>
+        <p class="text-sm">Text <span class="font-bold">COMMANDS</span> too see all commands</p>
       </section>
     </main>
   </section>
@@ -345,7 +623,7 @@
       </section>
 
       <section class="bg-[var(--card)] p-6 rounded-xl shadow hover-grow animate-fadeIn" style="animation-delay: 0.6s;">
-        <h3 class="text-xl font-semibold mb-2">🔔 Reminder & Auto-Call Logic</h3>
+        <h3 class="text-xl font-semibold mb-2">🔔 Reminder &amp; Auto-Call Logic</h3>
         <ul class="list-disc ml-6 text-sm">
           <li>Only those who RSVP with <strong>JOIN</strong> are added to the dial list.</li>
           <li>You'll receive a reminder SMS 5 minutes before the group starts.</li>
@@ -505,11 +783,11 @@
       <a href="https://www.facebook.com/share/16X3b1kqoK/" target="_blank" class="text-blue-700 hover:text-blue-900 hover-grow" title="Facebook"><i class="fab fa-facebook"></i></a>
       <a href="https://www.instagram.com/talkloop_org?igsh=MXA1YWJvd2VoajB2Yw==" target="_blank" class="text-pink-500 hover:text-pink-700 hover-grow" title="Instagram"><i class="fab fa-instagram"></i></a>
     </div>
-   <p class="mb-1">&copy; 2025 TalkLoop. All rights reserved.</p>
-<p class="text-xs text-gray-500">
-  <a href="/privacy.html" class="hover:underline">Privacy Policy</a> |
-  <a href="/terms.html" class="hover:underline">Terms of Use</a>
-</p>
+    <p class="mb-1">&copy; 2025 TalkLoop. All rights reserved.</p>
+    <p class="text-xs text-gray-500">
+      <a href="/privacy.html" class="hover:underline">Privacy Policy</a> |
+      <a href="/terms.html" class="hover:underline">Terms of Use</a>
+    </p>
   </footer>
 
   <script>
@@ -518,10 +796,8 @@
       const html = document.documentElement;
       const newTheme = html.dataset.theme === 'dark' ? 'light' : 'dark';
       html.dataset.theme = newTheme;
-      
       // Save preference to localStorage
       localStorage.setItem('theme', newTheme);
-      
       // Update button icon
       const themeIcon = document.querySelector('[title="Toggle Theme"] i');
       if (themeIcon) {
@@ -544,18 +820,16 @@
       backdrop.classList.remove('active');
     }
 
-    // Navigation handling
+    // Navigation handling and popup logic
     document.addEventListener('DOMContentLoaded', function() {
       // Set initial theme from localStorage
       const savedTheme = localStorage.getItem('theme') || 'light';
       document.documentElement.dataset.theme = savedTheme;
-      
       // Update theme icon
       const themeIcon = document.querySelector('[title="Toggle Theme"] i');
       if (themeIcon) {
         themeIcon.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-adjust';
       }
-
       // Handle navigation clicks (both desktop and mobile)
       const navLinks = document.querySelectorAll('.nav-link');
       navLinks.forEach(link => {
@@ -563,38 +837,32 @@
           e.preventDefault();
           const sectionId = this.getAttribute('data-section');
           showSection(sectionId);
-          
           // Update active nav link
           navLinks.forEach(link => link.classList.remove('active'));
           this.classList.add('active');
-          
           // Update URL without reloading
           history.pushState(null, null, `#${sectionId}`);
         });
       });
-
       // Handle form submission
       document.getElementById('looperForm')?.addEventListener('submit', async function(e) {
         e.preventDefault();
         const form = e.target;
         const submitBtn = form.querySelector('button[type="submit"]');
         const responseEl = document.getElementById('response');
-        
         // Get form data
         const formData = {
           name: form.name.value,
           phone: form.phone.value,
           group: form.group.value
         };
-
         // Show loading state
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
         responseEl.textContent = '';
         responseEl.classList.remove('text-green-500', 'text-red-500');
-
         try {
-          const response = await fetch(form.action, {  // Now using form.action which points to your Twilio endpoint
+          const response = await fetch(form.action, {
             method: 'POST',
             headers: { 
               'Content-Type': 'application/json',
@@ -602,27 +870,23 @@
             },
             body: JSON.stringify(formData)
           });
-
           const result = await response.json();
-          
           if (response.ok) {
             responseEl.textContent = result.message || 'Thank you for signing up! We will contact you soon.';
             responseEl.classList.add('text-green-500');
-            form.reset(); // Reset form on success
+            form.reset();
           } else {
             throw new Error(result.message || 'Failed to submit form');
           }
         } catch (err) {
           console.error('Form submission error:', err);
-          responseEl.textContent = typeof err === 'string' ? err : 
-            err.message || 'Something went wrong. Please try again later.';
+          responseEl.textContent = typeof err === 'string' ? err : err.message || 'Something went wrong. Please try again later.';
           responseEl.classList.add('text-red-500');
         } finally {
           submitBtn.disabled = false;
           submitBtn.textContent = 'Sign Up';
         }
       });
-
       // Check URL hash on load
       const hash = window.location.hash.substring(1);
       if (hash) {
@@ -635,8 +899,27 @@
           }
         });
       }
+      // Welcome popup functionality
+      const popup = document.getElementById('welcomePopup');
+      const closeBtn = document.getElementById('closePopup');
+      const getStartedBtn = document.getElementById('getStartedBtn');
+      // Show popup only for first-time visitors
+      if (localStorage.getItem('talkloop_welcome_shown') !== 'true') {
+        setTimeout(() => {
+          popup.classList.add('active');
+          localStorage.setItem('talkloop_welcome_shown', 'true');
+        }, 1000);
+      }
+      // Close popup when close button is clicked
+      closeBtn?.addEventListener('click', function() {
+        popup.classList.remove('active');
+      });
+      // Close popup when Get Started button is clicked
+      getStartedBtn?.addEventListener('click', function(e) {
+        e.preventDefault();
+        popup.classList.remove('active');
+      });
     });
-
     // Show the selected section
     function showSection(sectionId) {
       const sections = document.querySelectorAll('.page-section');
@@ -646,11 +929,9 @@
           section.classList.add('active');
         }
       });
-      
       // Scroll to top of the section
       document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
     }
-
     // Handle back/forward navigation
     window.addEventListener('popstate', function() {
       const hash = window.location.hash.substring(1);
