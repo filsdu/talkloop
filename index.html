@@ -903,7 +903,7 @@ document.getElementById('looperForm')?.addEventListener('submit', async function
     }
 
     const result = await response.json();
-    responseEl.textContent = result.message || 'Thank you for signing up! We will contact you soon.';
+    responseEl.textContent = result.message || 'Thank you for signing up! Text Online to rceive Calls.';
     responseEl.classList.add('text-green-500');
     form.reset();
   } catch (err) {
