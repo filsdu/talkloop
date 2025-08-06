@@ -557,6 +557,7 @@ Want to help? Call to connect — or register as a Looper and text “Online” 
   </section>
 
  <!-- Join Section -->
+<!-- Join Section -->
 <section id="join" class="page-section">
   <main class="px-6 py-16 max-w-3xl mx-auto">
     <h2 class="text-3xl font-bold text-center mb-10 animate-fadeIn">Join the Loop</h2>
@@ -585,12 +586,22 @@ Want to help? Call to connect — or register as a Looper and text “Online” 
           <p class="text-xs text-gray-500 mt-1">Enter your 10-digit phone number without country code</p>
         </div>
         <div>
-          <label for="group" class="block font-semibold mb-1">Group</label>
-          <select id="group" name="group" class="w-full px-4 py-2 rounded border focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
-            <option value="students">Students</option>
-            <option value="elders">Elders</option>
-            <option value="general">General</option>
-          </select>
+          <label class="block font-semibold mb-1">Choose groups you would like to receive calls from when you are online</label>
+          <div class="space-y-2 mt-2">
+            <label class="flex items-center">
+              <input type="checkbox" name="groups" value="students" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+              Students
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" name="groups" value="elders" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+              Elders
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" name="groups" value="general" class="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+              General
+            </label>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">Select one or more groups</p>
         </div>
         <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg btn-transition">
           Sign Up
@@ -599,20 +610,20 @@ Want to help? Call to connect — or register as a Looper and text “Online” 
       </form>
     </section>
 
-      <section class="bg-[var(--card)] p-6 rounded-xl shadow mb-12 hover-grow animate-fadeIn" style="animation-delay: 0.4s;">
-        <h3 class="text-xl font-semibold mb-3">Group Chat RSVP</h3>
-        <p class="text-sm mb-2">To join the next chat session, text <strong>JOIN</strong> to our line.</p>
-        <p class="text-sm">To skip this session, text <strong>BUSY</strong>.</p>
-      </section>
+    <section class="bg-[var(--card)] p-6 rounded-xl shadow mb-12 hover-grow animate-fadeIn" style="animation-delay: 0.4s;">
+      <h3 class="text-xl font-semibold mb-3">Group Chat RSVP</h3>
+      <p class="text-sm mb-2">To join the next chat session, text <strong>JOIN</strong> to our line.</p>
+      <p class="text-sm">To skip this session, text <strong>BUSY</strong>.</p>
+    </section>
 
-      <section class="bg-[var(--card)] p-6 rounded-xl shadow hover-grow animate-fadeIn" style="animation-delay: 0.6s;">
-        <h3 class="text-xl font-semibold mb-3">Availability Status</h3>
-        <p class="text-sm mb-2">Text <span class="font-bold">ONLINE</span> when you're ready to take calls.</p>
-        <p class="text-sm">Text <span class="font-bold">OFFLINE</span> when you're unavailable.</p>
-        <p class="text-sm">Text <span class="font-bold">COMMANDS</span> too see all commands</p>
-      </section>
-    </main>
-  </section>
+    <section class="bg-[var(--card)] p-6 rounded-xl shadow hover-grow animate-fadeIn" style="animation-delay: 0.6s;">
+      <h3 class="text-xl font-semibold mb-3">Availability Status</h3>
+      <p class="text-sm mb-2">Text <span class="font-bold">ONLINE</span> when you're ready to take calls.</p>
+      <p class="text-sm">Text <span class="font-bold">OFFLINE</span> when you're unavailable.</p>
+      <p class="text-sm">Text <span class="font-bold">COMMANDS</span> to see all commands</p>
+    </section>
+  </main>
+</section>
 
   <!-- Schedule Section -->
   <section id="schedule" class="page-section">
@@ -857,10 +868,9 @@ Want to help? Call to connect — or register as a Looper and text “Online” 
           history.pushState(null, null, `#${sectionId}`);
         });
       });
+      
       // Handle form submission
-   
-// Add this inside the DOMContentLoaded event listener
-document.getElementById('looperForm')?.addEventListener('submit', async function(e) {
+   document.getElementById('looperForm')?.addEventListener('submit', async function(e) {
   e.preventDefault();
   const form = e.target;
   const submitBtn = form.querySelector('button[type="submit"]');
@@ -872,11 +882,23 @@ document.getElementById('looperForm')?.addEventListener('submit', async function
   submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
   
   // Get form data
+  const groups = Array.from(form.querySelectorAll('input[name="groups"]:checked'))
+    .map(input => input.value);
+  
   const formData = {
     name: form.name.value,
     phone: form.phone.value,
-    group: form.group.value
+    groups: groups
   };
+
+  // Validate groups
+  if (groups.length === 0) {
+    responseEl.textContent = 'Please select at least one group';
+    responseEl.classList.add('text-red-500');
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalText;
+    return;
+  }
 
   // Clear previous messages
   responseEl.textContent = '';
@@ -904,7 +926,7 @@ document.getElementById('looperForm')?.addEventListener('submit', async function
     }
 
     const result = await response.json();
-    responseEl.textContent = result.message || 'Thank you for signing up! Text Online to rceive Calls.';
+    responseEl.textContent = result.message || 'Thank you for signing up! Text ONLINE to receive calls.';
     responseEl.classList.add('text-green-500');
     form.reset();
   } catch (err) {
